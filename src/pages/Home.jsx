@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useWeather } from "../context/WeatherContext";
+import CurrentWeatherCard from "../components/CurrentWeatherCard";
 
 const Home = () => {
   const { weather, loading, error, fetchCurrentWeather } = useWeather();
   const [input, setInput] = useState("");
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (input.trim() !== "") {
-      fetchCurrentWeather(input);
-      setInput("");
-    }
-  };
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (input.trim() !== "") {
+        fetchCurrentWeather(input);
+        setInput("");
+      }
+    },
+    [input, fetchCurrentWeather]
+  );
 
   return (
     <div className="py-20 mt-18 bg-linear-to-br from-slate-800 to-slate-700 min-h-screen text-white">
@@ -36,20 +39,7 @@ const Home = () => {
 
         {error && <p className="text-center text-red-300">{error}</p>}
 
-        {weather && (
-          <div className="bg-white/20 p-6 rounded-xl shadow text-center">
-            <h2 className="text-3xl font-bold">{weather.name}</h2>
-            <p className="text-6xl">{weather.main.temp}°C</p>
-            <p className="capitalize text-xl">
-              {weather.weather[0].description}
-            </p>
-
-            <div className="flex justify-center gap-10 mt-4">
-              <p>💨 {weather.wind.speed} km/h</p>
-              <p>💧 {weather.main.humidity}%</p>
-            </div>
-          </div>
-        )}
+        <CurrentWeatherCard weather={weather} />
       </div>
     </div>
   );

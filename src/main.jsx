@@ -1,23 +1,25 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.jsx";
 import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
   RouterProvider,
 } from "react-router-dom";
-import Layout from "./Layout.jsx";
-import Home from "./pages/Home.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
+
 import { WeatherProvider } from "./context/WeatherContext.jsx";
+
+// Lazy imports for route components
+const Layout = lazy(() => import("./Layout.jsx"));
+const Home = lazy(() => import("./pages/Home.jsx"));
+const About = lazy(() => import("./pages/About.jsx"));
+const Contact = lazy(() => import("./pages/Contact.jsx"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
-      <Route path="" element={<Home />} />
+      <Route index element={<Home />} />
       <Route path="about" element={<About />} />
       <Route path="contact" element={<Contact />} />
     </Route>
@@ -27,7 +29,15 @@ const router = createBrowserRouter(
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <WeatherProvider>
-      <RouterProvider router={router} />
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+            <p className="text-xl">Loading app...</p>
+          </div>
+        }
+      >
+        <RouterProvider router={router} />
+      </Suspense>
     </WeatherProvider>
   </StrictMode>
 );
